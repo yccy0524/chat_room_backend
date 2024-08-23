@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-22 11:32:04
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-22 15:31:11
+ * @LastEditTime: 2024-08-23 14:13:24
  * @Description:
  */
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -38,10 +38,6 @@ export class EmailService {
     try {
       await this.redisService.set(`captcha_${email}`, captcha, 60 * 5);
       await this.sendEmail({
-        from: {
-          address: this.configService.get('EMAIL_ADDRESS'),
-          name: '聊天室',
-        },
         to: email,
         subject: `邮箱验证码`,
         html: `<p>您的邮箱验证码是：${captcha}</p>`,
@@ -49,19 +45,21 @@ export class EmailService {
 
       return '发送成功';
     } catch (err) {
-      this.logger.error(err);
+      this.logger.error(err, EmailService);
     }
   }
 
   async sendEmail(options: {
-    from: string | Mail.Address;
     to: string | Mail.Address;
     subject: string;
     html: string;
   }) {
-    const { from, to, subject, html } = options;
+    const { to, subject, html } = options;
     return await this.transporter.sendMail({
-      from,
+      from: {
+        address: this.configService.get('EMAIL_ADDRESS'),
+        name: '聊天室',
+      },
       to,
       subject,
       html,

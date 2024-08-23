@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-22 09:25:30
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-22 11:24:46
+ * @LastEditTime: 2024-08-23 14:26:55
  * @Description: user
  */
 import {
@@ -16,6 +16,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RedisService } from 'src/redis/redis.service';
 import { md5 } from 'src/utils/util';
+import { LoginUserDto } from './dto/login-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import { LoginUserVo } from './vo/login-user.vo';
 
 @Injectable()
 export class UserService {
@@ -25,8 +28,12 @@ export class UserService {
   @Inject(RedisService)
   private redisService: RedisService;
 
+  @Inject(JwtService)
+  private jwtService: JwtService;
+
   private logger = new Logger();
 
+  // 注册
   async register(registerUser: RegisterUserDto) {
     const captcha = await this.redisService.get(
       `captcha_${registerUser.email}`,
@@ -70,5 +77,36 @@ export class UserService {
       this.logger.error(err, UserService);
       return null;
     }
+  }
+
+  // 登录
+  async login(loginUser: LoginUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username: loginUser.username,
+      },
+    });
+    if (!user) {
+      throw new HttpException('用户名不正确', HttpStatus.BAD_REQUEST);
+    }
+    if (md5(loginUser.password) !== user.password) {
+      throw new HttpException('密码不正确', HttpStatus.BAD_REQUEST);
+    }
+    const userInfo = new LoginUserVo();
+    userInfo.username = user.username;
+    userInfo.email = user.email;
+    userInfo.headPic = user.headePic;
+    userInfo.id = user.id;
+    userInfo.nickname = user.nickname;
+    userInfo.token = this.jwtService.sign(
+      {
+        uid: user.id,
+        username: user.username,
+      },
+      {
+        expiresIn: '7d',
+      },
+    );
+    return userInfo;
   }
 }
