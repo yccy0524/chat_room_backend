@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-22 09:25:30
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-23 14:26:55
+ * @LastEditTime: 2024-08-23 17:21:16
  * @Description: user
  */
 import {
@@ -19,6 +19,9 @@ import { md5 } from 'src/utils/util';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserVo } from './vo/login-user.vo';
+import { UpdateUserInfoDto } from './dto/update-user.dto';
+import { UserInfoVo } from './vo/user-info.vo';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UserService {
@@ -108,5 +111,72 @@ export class UserService {
       },
     );
     return userInfo;
+  }
+
+  // 更改用户信息
+  async updateUserInfo(uid: number, updateUserInfo: UpdateUserInfoDto) {
+    const captcha = await this.redisService.get(
+      `captcha_${updateUserInfo.email}`,
+    );
+
+    if (!captcha || captcha !== updateUserInfo.captcha) {
+      throw new HttpException('验证码不正确', HttpStatus.BAD_REQUEST);
+    }
+
+    const updateUser = await this.prisma.user.update({
+      where: {
+        id: uid,
+      },
+      data: {
+        headePic: updateUserInfo.headPic,
+        nickname: updateUserInfo.nickname,
+      },
+    });
+    const user = new UserInfoVo();
+    user.id = updateUser.id;
+    user.nickname = updateUser.nickname;
+    user.username = updateUser.username;
+    user.headPic = updateUser.headePic;
+    user.email = updateUser.email;
+
+    return user;
+  }
+
+  // 更改密码
+  async updatePassword(data: UpdatePasswordDto) {
+    const captcha = await this.redisService.get(`captcha_${data.email}`);
+    if (!captcha || captcha !== data.captcha) {
+      throw new HttpException('验证码不正确', HttpStatus.BAD_REQUEST);
+    }
+
+    await this.prisma.user.update({
+      where: {
+        username: data.username,
+        email: data.email,
+      },
+      data: {
+        password: md5(data.password),
+      },
+    });
+
+    return '修改成功';
+  }
+
+  // 获取用户信息
+  async getUserInfo(uid: number) {
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        id: uid,
+      },
+    });
+
+    const user = new UserInfoVo();
+    user.id = foundUser.id;
+    user.nickname = foundUser.nickname;
+    user.username = foundUser.username;
+    user.headPic = foundUser.headePic;
+    user.email = foundUser.email;
+
+    return user;
   }
 }
