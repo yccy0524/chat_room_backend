@@ -36,3 +36,15 @@ model FriendShip {
 
   @@id([uid, friendId])
 }
+
+model Friend_Request {
+  id         Int      @id @default(autoincrement())
+  fromUid    Int
+  toUid      Int
+  // 添加理由
+  reason     String   @db.VarChar(100)
+  // 状态 0 请求中 1 已同意 2 已拒绝
+  status     Int
+  createTime DateTime @default(now())
+  updateTime DateTime @updatedAt
+}
