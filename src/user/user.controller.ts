@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-22 09:25:30
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-23 17:15:48
+ * @LastEditTime: 2024-08-26 10:03:43
  * @Description:
  */
 import { Body, Controller, Get, Post } from '@nestjs/common';
@@ -50,5 +50,12 @@ export class UserController {
   @Get('getUserInfo')
   async getUserInfo(@UserInfo('uid') uid: number) {
     return await this.userService.getUserInfo(uid);
+  }
+
+  // 获取朋友列表
+  @RequireLogin()
+  @Get('friendship')
+  async getFriendShip(@UserInfo('uid') uid: number) {
+    return await this.userService.getFriendShip(uid);
   }
 }

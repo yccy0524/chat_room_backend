@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-21 11:52:21
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-23 13:59:36
+ * @LastEditTime: 2024-08-26 09:14:53
  * @Description:
  */
 import { Module } from '@nestjs/common';
@@ -21,7 +21,7 @@ import { AuthGuard } from './auth.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: 'src/.env',
+      envFilePath: './env',
     }),
     JwtModule.register({
       secret: 'yc',
