@@ -2,10 +2,19 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-26 10:28:58
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-26 11:23:24
+ * @LastEditTime: 2024-08-27 09:06:12
  * @Description:
+ *
  */
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { RequireLogin, UserInfo } from 'src/decorator';
 import { AddFriendDto } from './dto/add-friend.dto';
@@ -24,5 +33,15 @@ export class FriendshipController {
   @Get('getFriendRequestList')
   async getFriendRequestList(@UserInfo('uid') uid: number) {
     return await this.friendshipService.getFriendRequestList(uid);
+  }
+
+  // 同意添加好友
+  @RequireLogin()
+  @Get('agree/:uid')
+  async agree(@Param('uid') friendId: number, @UserInfo('uid') uid: number) {
+    if (!friendId) {
+      throw new HttpException('好友id不能为空', HttpStatus.BAD_REQUEST);
+    }
+    return await this.friendshipService.agree(friendId, uid);
   }
 }

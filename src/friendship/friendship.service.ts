@@ -26,4 +26,34 @@ export class FriendshipService {
       },
     });
   }
+
+  // 同意添加好友
+  async agree(friendId: number, uid: number) {
+    await this.prisma.friend_Request.updateMany({
+      where: {
+        toUid: uid,
+        fromUid: friendId,
+        status: 0,
+      },
+      data: {
+        status: 1,
+      },
+    });
+
+    const res = await this.prisma.friendShip.findMany({
+      where: {
+        friendId,
+        uid,
+      },
+    });
+    if (!res.length) {
+      await this.prisma.friendShip.create({
+        data: {
+          uid: uid,
+          friendId: friendId,
+        },
+      });
+    }
+    return '添加成功';
+  }
 }
