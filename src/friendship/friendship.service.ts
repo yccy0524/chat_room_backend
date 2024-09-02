@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-26 10:28:58
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-30 09:13:57
+ * @LastEditTime: 2024-08-30 09:43:07
  * @Description:
  */
 import { Inject, Injectable } from '@nestjs/common';
@@ -122,5 +122,17 @@ export class FriendshipService {
     }
 
     return res;
+  }
+
+  // 删除好友
+  async deleteFriend(friendId: number, uid: number) {
+    await this.prisma.friendShip.deleteMany({
+      where: {
+        uid: uid,
+        friendId: friendId,
+      },
+    });
+
+    return '删除成功';
   }
 }

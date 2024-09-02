@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-26 10:28:58
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-08-30 09:14:25
+ * @LastEditTime: 2024-08-30 09:56:48
  * @Description:
  *
  */
@@ -57,8 +57,18 @@ export class FriendshipController {
 
   // 获取朋友列表
   @RequireLogin()
-  @Get('friendship')
+  @Get('list')
   async getFriendShip(@UserInfo('uid') uid: number) {
     return await this.friendshipService.getFriendShip(uid);
+  }
+
+  // 删除好友
+  @RequireLogin()
+  @Get('delete/:uid')
+  async deleteFriend(
+    @Param('uid') friendId: number,
+    @UserInfo('uid') uid: number,
+  ) {
+    return await this.friendshipService.deleteFriend(friendId, uid);
   }
 }
