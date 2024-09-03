@@ -71,6 +71,9 @@ export class ChatroomService {
         id: {
           in: roomIdList.map((item) => item.chatroomId),
         },
+        name: {
+          contains: data.roomName,
+        },
       },
       select: {
         id: true,

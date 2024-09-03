@@ -14,6 +14,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { RequireLogin, UserInfo } from 'src/decorator';
@@ -58,8 +59,11 @@ export class FriendshipController {
   // 获取朋友列表
   @RequireLogin()
   @Get('list')
-  async getFriendShip(@UserInfo('uid') uid: number) {
-    return await this.friendshipService.getFriendShip(uid);
+  async getFriendShip(
+    @UserInfo('uid') uid: number,
+    @Query('name') name?: string,
+  ) {
+    return await this.friendshipService.getFriendShip(uid, name);
   }
 
   // 删除好友
