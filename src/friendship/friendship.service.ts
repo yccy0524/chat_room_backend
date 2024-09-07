@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-08-26 10:28:58
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-09-03 17:05:06
+ * @LastEditTime: 2024-09-03 17:24:13
  * @Description:
  */
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
@@ -56,13 +56,11 @@ export class FriendshipService {
     const fromMeRequest = await this.prisma.friend_Request.findMany({
       where: {
         fromUid: uid,
-        status: 0,
       },
     });
     const toMeRequest = await this.prisma.friend_Request.findMany({
       where: {
         toUid: uid,
-        status: 0,
       },
     });
 

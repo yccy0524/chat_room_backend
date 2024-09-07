@@ -18,6 +18,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { FriendshipModule } from './friendship/friendship.module';
 import { ChatroomModule } from './chatroom/chatroom.module';
+import { ChatModule } from './chat/chat.module';
+import { ChatHistoryModule } from './chat-history/chat-history.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { ChatroomModule } from './chatroom/chatroom.module';
     EmailModule,
     FriendshipModule,
     ChatroomModule,
+    ChatModule,
+    ChatHistoryModule,
   ],
   controllers: [AppController],
   providers: [

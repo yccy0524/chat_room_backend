@@ -64,3 +64,13 @@ model UserChatroom {
 
   @@id([uid, chatroomId])
 }
+
+model ChatHistory {
+  id         Int      @id @default(autoincrement())
+  content    String   @db.VarChar(500)
+  type       Int // text 0  image 1 file 2
+  chatroomId Int
+  uid        Int
+  createTime DateTime @default(now())
+  updateTime DateTime @updatedAt
+}
