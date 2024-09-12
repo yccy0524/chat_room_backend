@@ -2,7 +2,7 @@
  * @Author: yancheng 404174228@qq.com
  * @Date: 2024-09-03 17:33:20
  * @LastEditors: yancheng 404174228@qq.com
- * @LastEditTime: 2024-09-03 17:55:40
+ * @LastEditTime: 2024-09-07 14:02:52
  * @Description:
  */
 import {
@@ -13,6 +13,8 @@ import {
 } from '@nestjs/websockets';
 import { ChatService } from './chat.service';
 import { Server, Socket } from 'socket.io';
+import { Inject } from '@nestjs/common';
+import { ChatHistoryService } from 'src/chat-history/chat-history.service';
 
 interface JoinRoomPayload {
   chatroomId: number;
@@ -34,6 +36,9 @@ export class ChatGateway {
 
   @WebSocketServer() server: Server;
 
+  @Inject(ChatHistoryService)
+  private chatHistoryService: ChatHistoryService;
+
   @SubscribeMessage('joinRoom')
   joinRoom(client: Socket, payload: JoinRoomPayload) {
     const roomName = payload.chatroomId.toString();
@@ -45,8 +50,16 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('sendMessage')
-  sendMessage(@MessageBody() payload: SendMessagePayload) {
+  async sendMessage(@MessageBody() payload: SendMessagePayload) {
     const roomName = payload.chatroomId.toString();
+    await this.chatHistoryService.add(
+      {
+        type: payload.message.type === 'image' ? 1 : 0,
+        content: payload.message.content,
+        chatroomId: payload.chatroomId,
+      },
+      payload.sendUid,
+    );
     this.server.to(roomName).emit('message', {
       type: 'sendMessage',
       uid: payload.sendUid,
